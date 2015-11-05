@@ -1,6 +1,7 @@
 var ProgressBar  = Object.create(HTMLElement.prototype);
 
 ProgressBar.createdCallback = function() {
+  debugger;
   var outerBar = document.createElement('div');
   outerBar.style.width="100px";
   outerBar.style.height="20px";
@@ -18,6 +19,7 @@ ProgressBar.createdCallback = function() {
 };
 
 ProgressBar.attributeChangedCallback = function(attrName, oldVal, newVal) {
+  debugger;
   console.log(attrName, oldVal, newVal)
   if(attrName === 'value'){
     var bar = this.querySelector('div div');
