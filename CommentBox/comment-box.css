@@ -1,0 +1,31 @@
+.comment-box {
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  border: 1px solid gray;
+}
+
+.comment-box .comment-display-area {
+  width: 100%;
+}
+
+.comment-box .comment-display-area .comment-list {
+  width: 100%;
+}
+
+.comment-box .comment-display-area .comment-list .comment-list-item {
+  width: 100%;
+}
+
+.comment-box .comment-area {
+  width: 100%;
+}
+
+.comment-box .comment-area .comment-writer {
+  width: 100%;
+  height: 150px;
+}
+
+.comment-box .comment-area .comment-button {
+
+}
