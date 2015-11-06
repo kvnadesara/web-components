@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
 <head>
-  <script src="../platform.js"></script>
+  <!-- <script src="../webcomponentsjs/webcomponents.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.16/webcomponents.js" charset="utf-8"></script>
   <script src="../HTMLElementHelper.js"></script>
   <script src="comment-box.js"></script>
   <link rel="stylesheet" href="comment-box.css" media="screen" charset="utf-8">
@@ -16,7 +17,7 @@
 <body>
   <h3>Comment-Box Example</h3>
   <div class="comment">
-    <comment-box></comment-box>
+    <comment-box limit=10></comment-box>
   </div>
 </body>
 

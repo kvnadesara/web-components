@@ -29,3 +29,8 @@
 .comment-box .comment-area .comment-button {
 
 }
+
+.comment-box .comment-area .comment-limit-label {
+  color: blue;
+  float: right;
+}

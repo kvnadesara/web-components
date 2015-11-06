@@ -7,7 +7,6 @@ var HTMLElementHelper = {
    */
   createElement: function(eleName, attrs) {
     var ele = document.createElement(eleName);
-
     if (attrs != undefined) {
       var style = null;
       if (attrs.style != undefined) {
@@ -20,21 +19,27 @@ var HTMLElementHelper = {
       }
 
       if (style) {
-        debugger;
-        if (typeof style === 'array') {
+
+        if (Object.prototype.toString.call( style ) === '[object Array]') {
           style.forEach(function(s) {
             HTMLElementHelper.applyStyle(s, ele);
           });
         } else {
-          HTMLElementHelper.applyStyle(s, ele);
+          HTMLElementHelper.applyStyle(style, ele);
         }
       }
     }
     return ele;
   },
 
+  /**
+   * Apply style to element
+   * @param  {String} style style
+   * @param  {HTMLElement} ele   element
+   */
   applyStyle: function(style, ele) {
-    var sAr = s.split(":");
+    debugger;
+    var sAr = style.split(":");
     if (sAr && sAr.length != 2)
       return;
     var key = '"' + sAr[0].trim().replace(/"/g, '') + '"';
@@ -48,7 +53,6 @@ var HTMLElementHelper = {
    * @return {Object}      Attributes object
    */
   attrToJSON: function(node) {
-    debugger;
     var attrs = node.attributes;
     var attrJson = {};
     for (var i = 0; i < attrs.length; i++) {
@@ -56,5 +60,9 @@ var HTMLElementHelper = {
     }
 
     return attrJson;
+  },
+
+  removeAttribute: function(attr, ele) {
+    ele.removeAttribute(attr);
   }
 }
