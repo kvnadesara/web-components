@@ -38,7 +38,6 @@ var HTMLElementHelper = {
    * @param  {HTMLElement} ele   element
    */
   applyStyle: function(style, ele) {
-    debugger;
     var sAr = style.split(":");
     if (sAr && sAr.length != 2)
       return;
@@ -61,8 +60,4 @@ var HTMLElementHelper = {
 
     return attrJson;
   },
-
-  removeAttribute: function(attr, ele) {
-    ele.removeAttribute(attr);
-  }
 }

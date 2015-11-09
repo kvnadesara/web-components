@@ -30,7 +30,7 @@
 
 }
 
-.comment-box .comment-area .comment-limit-label {
+.comment-box .comment-area .comment-maxlength-label {
   color: blue;
   float: right;
 }
