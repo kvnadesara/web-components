@@ -22,10 +22,10 @@ var HTMLElementHelper = {
 
         if (Object.prototype.toString.call( style ) === '[object Array]') {
           style.forEach(function(s) {
-            HTMLElementHelper.applyStyle(s, ele);
+            HTMLElementHelper.applyStyle(ele, s);
           });
         } else {
-          HTMLElementHelper.applyStyle(style, ele);
+          HTMLElementHelper.applyStyle(ele, style);
         }
       }
     }
@@ -37,7 +37,7 @@ var HTMLElementHelper = {
    * @param  {String} style style
    * @param  {HTMLElement} ele   element
    */
-  applyStyle: function(style, ele) {
+  applyStyle: function(ele, style) {
     var sAr = style.split(":");
     if (sAr && sAr.length != 2)
       return;
@@ -45,7 +45,7 @@ var HTMLElementHelper = {
     var val = sAr[1].trim();
     ele.style[key] = val;
   },
-
+  
   /**
    * Create an Object of attributes of given node
    * @param  {HTMLElement} node Html element
