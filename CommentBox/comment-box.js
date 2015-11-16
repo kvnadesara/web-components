@@ -1,147 +1,159 @@
-var groupName = window.location.href;
-var socket = io('http://localhost:3000');
 
-var CommentBoxHelper = {
-  container: null,  // main container div
-  attrs: {},
+function CreateCommenBoxHelper(container) {
+  var CommentBoxHelper = {
+    groupName: null,
+    socket: null,
+    container: null,  // main container div
+    attrs: {},
 
-  createCommentDisplayArea: function() {
-    var commentDisplayAreaContainer = HTMLElementHelper.createElement('DIV', {
-      'class': 'comment-display-area'
-    });
-    var commentList = HTMLElementHelper.createElement('UL', {
-      'class': 'comment-list'
-    });
-    commentDisplayAreaContainer.appendChild(commentList);
-
-    CommentBoxHelper.container.appendChild(commentDisplayAreaContainer);
-  },
-
-  createCommentArea: function() {
-    var commentAreaContainer = HTMLElementHelper.createElement('DIV', {
-      'class': 'comment-area'
-    });
-    var commentTextArea = HTMLElementHelper.createElement('TEXTAREA', {
-      'class': 'comment-writer'
-    });
-
-    if (CommentBoxHelper.attrs.hasOwnProperty('maxlength')) {
-      commentTextArea.setAttribute('maxlength', CommentBoxHelper.attrs.maxlength);
-    }
-
-    if (CommentBoxHelper.attrs.hasOwnProperty('showmaxlength')) {
-      var maxlengthLabel = HTMLElementHelper.createElement('LABEL', {
-        'class': 'comment-maxlength-label',
+    createCommentDisplayArea: function() {
+      var commentDisplayAreaContainer = HTMLElementHelper.createElement('DIV', {
+        'class': 'comment-display-area'
       });
-      commentAreaContainer.appendChild(maxlengthLabel);
-    }
+      var commentList = HTMLElementHelper.createElement('UL', {
+        'class': 'comment-list'
+      });
+      commentDisplayAreaContainer.appendChild(commentList);
 
-    commentAreaContainer.appendChild(commentTextArea);
-    var addCommentButton = HTMLElementHelper.createElement('BUTTON', {
-      'class': 'comment-button'
-    });
-    addCommentButton.innerHTML = "Add Comment";
-    commentAreaContainer.appendChild(addCommentButton); //
+      CommentBoxHelper.container.appendChild(commentDisplayAreaContainer);
+    },
 
+    createCommentArea: function() {
+      var commentAreaContainer = HTMLElementHelper.createElement('DIV', {
+        'class': 'comment-area'
+      });
+      var commentTextArea = HTMLElementHelper.createElement('TEXTAREA', {
+        'class': 'comment-writer'
+      });
 
-    CommentBoxHelper.container.appendChild(commentAreaContainer);
+      if (CommentBoxHelper.attrs.hasOwnProperty('maxlength')) {
+        commentTextArea.setAttribute('maxlength', CommentBoxHelper.attrs.maxlength);
+      }
 
-    CommentBoxHelper.updateMaxlengthLabel();
-  },
+      if (CommentBoxHelper.attrs.hasOwnProperty('showmaxlength')) {
+        var maxlengthLabel = HTMLElementHelper.createElement('LABEL', {
+          'class': 'comment-maxlength-label',
+        });
+        commentAreaContainer.appendChild(maxlengthLabel);
+      }
 
-  addComment: function(comment) {
-    console.log(comment);
-    var container = CommentBoxHelper.get('.comment-display-area .comment-list');
-    var li = HTMLElementHelper.createElement('LI', {
-      'class': 'comment-list-item'
-    });
-    if (li.hasOwnProperty('innerText'))
-      li.innerText = comment;
-    else
-      li.textContent = comment;
-    container.appendChild(li);
-  },
+      commentAreaContainer.appendChild(commentTextArea);
+      var addCommentButton = HTMLElementHelper.createElement('BUTTON', {
+        'class': 'comment-button'
+      });
+      addCommentButton.innerHTML = "Add Comment";
 
-  updateMaxlengthLabel: function() {
-    var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
+      commentAreaContainer.appendChild(addCommentButton); //
+      CommentBoxHelper.container.appendChild(commentAreaContainer);
 
-    if(maxlengthLabel == null) {
-      return;
-    }
+      CommentBoxHelper.updateMaxlengthLabel();
+    },
 
-    var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
-    var total = commentTextArea.value.length;
-    var text = total;
-    if (CommentBoxHelper.attrs.maxlength != undefined) {
-      var max = parseInt(CommentBoxHelper.attrs.maxlength);
-      var text = total + ' / ' + max;
-    }
-    if (maxlengthLabel.hasOwnProperty('innerText'))
-      maxlengthLabel.innerText = text;
-    else
-      maxlengthLabel.textContent = text;
-  },
+    addComment: function(comment) {
+      console.log(comment);
+      var container = CommentBoxHelper.get('.comment-display-area .comment-list');
+      var li = HTMLElementHelper.createElement('LI', {
+        'class': 'comment-list-item'
+      });
+      if (li.hasOwnProperty('innerText'))
+        li.innerText = comment;
+      else
+        li.textContent = comment;
+      container.appendChild(li);
+    },
 
-  get: function(key) {
-    return CommentBoxHelper.container.querySelector(key);
-  },
+    updateMaxlengthLabel: function() {
+      var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
 
-  bindAddCommentClickEvent: function() {
-    CommentBoxHelper.get('.comment-area .comment-button').addEventListener('click', function(event) {
-      var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
-      var text = commentTextArea.value;
-      if (text == '') {
+      if(maxlengthLabel == null) {
         return;
       }
-      CommentBoxHelper.addComment(text);
-      commentTextArea.value = '';
-      CommentBoxHelper.updateMaxlengthLabel();
-      socket.emit('message', {data:text});
-    });
-  },
 
-  bindCommentTextAreaKeyupEvent: function() {
-    var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
-    commentTextArea.addEventListener('keyup', function(event) {
-      CommentBoxHelper.updateMaxlengthLabel();
-    });
-  },
+      var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+      var total = commentTextArea.value.length;
+      var text = total;
+      if (CommentBoxHelper.attrs.maxlength != undefined) {
+        var max = parseInt(CommentBoxHelper.attrs.maxlength);
+        var text = total + ' / ' + max;
+      }
+      if (maxlengthLabel.hasOwnProperty('innerText'))
+        maxlengthLabel.innerText = text;
+      else
+        maxlengthLabel.textContent = text;
+    },
 
-  attributeChanged: function(attr, oldVal, newVal) {
-    console.log("Attribute changed: attr: %s | old-value: %s | new-value: %s", attr, oldVal, newVal);
-    CommentBoxHelper.attrs[attr] = newVal;
-    switch (attr) {
-      case 'showmaxlenght':
-        CommentBoxHelper.showHideMaxlengthLabel(newVal != null);
-        break;
-      case 'maxlength':
+    get: function(key) {
+      return CommentBoxHelper.container.querySelector(key);
+    },
+
+    bindAddCommentClickEvent: function() {
+      debugger;
+      console.log(this);
+      CommentBoxHelper.get('.comment-area .comment-button').addEventListener('click', function(event) {
         var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
-        commentTextArea.setAttribute('maxlength', parseInt(newVal));
+        var text = commentTextArea.value;
+        if (text == '') {
+          return;
+        }
+        CommentBoxHelper.addComment(text);
+        commentTextArea.value = '';
         CommentBoxHelper.updateMaxlengthLabel();
-        break;
-    }
-  },
+        CommentBoxHelper.socket.emit('message', {uuid:CommentBoxHelper.attrs.uuid, data:text});
+      });
+    },
 
-  showHideMaxlengthLabel: function(show) {
-    var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
-    if(maxlengthLabel == null)
-      return;
-    if(show === true) {
-      maxlengthLabel.removeAttribute('display');
-    } else {
-      maxlengthLabel.setAttribute('display', 'none');
-    }
-  },
+    bindCommentTextAreaKeyupEvent: function() {
+      var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+      commentTextArea.addEventListener('keyup', function(event) {
+        CommentBoxHelper.updateMaxlengthLabel();
+      });
+    },
+
+    attributeChanged: function(attr, oldVal, newVal) {
+      console.log("Attribute changed: attr: %s | old-value: %s | new-value: %s", attr, oldVal, newVal);
+      CommentBoxHelper.attrs[attr] = newVal;
+      switch (attr) {
+        case 'showmaxlenght':
+          CommentBoxHelper.showHideMaxlengthLabel(newVal != null);
+          break;
+        case 'maxlength':
+          var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+          commentTextArea.setAttribute('maxlength', parseInt(newVal));
+          CommentBoxHelper.updateMaxlengthLabel();
+          break;
+      }
+    },
+
+    showHideMaxlengthLabel: function(show) {
+      var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
+      if(maxlengthLabel == null) {
+        var maxlengthLabel = HTMLElementHelper.createElement('LABEL', {
+          'class': 'comment-maxlength-label',
+        });
+        CommentBoxHelper.get('.comment-area').appendChild(maxlengthLabel);
+      }
+
+      if(show === true) {
+        maxlengthLabel.removeAttribute('display');
+      } else {
+        maxlengthLabel.setAttribute('display', 'none');
+      }
+    },
+  }
+
+  CommentBoxHelper.container = container;
+  return CommentBoxHelper;
 }
 
 var CommentBox = Object.create(HTMLElement.prototype);
 
 CommentBox.createdCallback = function() {
-  CommentBoxHelper.attrs = HTMLElementHelper.attrToJSON(this);
   // create container
-  CommentBoxHelper.container = HTMLElementHelper.createElement('DIV', {
+  var container = HTMLElementHelper.createElement('DIV', {
     'class': 'comment-box'
   });
+  var CommentBoxHelper = CreateCommenBoxHelper(container);
+  CommentBoxHelper.attrs = HTMLElementHelper.attrToJSON(this);
 
   // create comment display area
   CommentBoxHelper.createCommentDisplayArea();
@@ -155,22 +167,29 @@ CommentBox.createdCallback = function() {
   // keypress event
   CommentBoxHelper.bindCommentTextAreaKeyupEvent();
 
-  socket.on('connect', function() {
-    socket.emit('subscribe', groupName);
+  var uuid = CommentBoxHelper.attrs.uuid || '';
+  var server = CommentBoxHelper.attrs.server || 'http://localhost:3000';
+
+  CommentBoxHelper.socket = io(server);
+
+  CommentBoxHelper.socket.on('connect', function() {
+    CommentBoxHelper.socket.emit('subscribe', uuid);
     var button = CommentBoxHelper.get('.comment-area .comment-button');
     button.removeAttribute('disabled');
   });
 
-  socket.on('subscriptionStatus', function(status){
+  CommentBoxHelper.socket.on('subscriptionStatus', function(status){
     console.log(status);
   });
 
-  socket.on('message', function(message) {
+  CommentBoxHelper.socket.on('message', function(message) {
     console.log(message);
-    CommentBoxHelper.addComment(message.data);
+    // if socket is connected to same server then it share the instance
+    if(message.uuid === CommentBoxHelper.attrs.uuid)
+      CommentBoxHelper.addComment(message.data);
   });
 
-  socket.on('disconnect', function() {
+  CommentBoxHelper.socket.on('disconnect', function() {
     var button = CommentBoxHelper.get('.comment-area .comment-button');
     button.setAttribute('disabled', 'disabled');
   });
