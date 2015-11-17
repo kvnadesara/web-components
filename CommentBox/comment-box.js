@@ -1,11 +1,26 @@
-
-function CreateCommenBoxHelper(container) {
+function CreateCommentBoxHelper(container) {
   var CommentBoxHelper = {
-    groupName: null,
+    /**
+     * Socket instance
+     * @type {Socket}
+     */
     socket: null,
-    container: null,  // main container div
+
+    /**
+     * Main container
+     * @type {DIV}
+     */
+    container: null,
+
+    /**
+     * Attributes of component
+     * @type {Object}
+     */
     attrs: {},
 
+    /**
+     * Create comment display area: comment-list
+     */
     createCommentDisplayArea: function() {
       var commentDisplayAreaContainer = HTMLElementHelper.createElement('DIV', {
         'class': 'comment-display-area'
@@ -15,9 +30,12 @@ function CreateCommenBoxHelper(container) {
       });
       commentDisplayAreaContainer.appendChild(commentList);
 
-      CommentBoxHelper.container.appendChild(commentDisplayAreaContainer);
+      this.container.appendChild(commentDisplayAreaContainer);
     },
 
+    /**
+     * Create comment area: comment-writer, comment-button, comment-maxlength-label
+     */
     createCommentArea: function() {
       var commentAreaContainer = HTMLElementHelper.createElement('DIV', {
         'class': 'comment-area'
@@ -26,11 +44,11 @@ function CreateCommenBoxHelper(container) {
         'class': 'comment-writer'
       });
 
-      if (CommentBoxHelper.attrs.hasOwnProperty('maxlength')) {
-        commentTextArea.setAttribute('maxlength', CommentBoxHelper.attrs.maxlength);
+      if (this.attrs.hasOwnProperty('maxlength')) {
+        commentTextArea.setAttribute('maxlength', this.attrs.maxlength);
       }
 
-      if (CommentBoxHelper.attrs.hasOwnProperty('showmaxlength')) {
+      if (this.attrs.hasOwnProperty('showmaxlength')) {
         var maxlengthLabel = HTMLElementHelper.createElement('LABEL', {
           'class': 'comment-maxlength-label',
         });
@@ -43,15 +61,19 @@ function CreateCommenBoxHelper(container) {
       });
       addCommentButton.innerHTML = "Add Comment";
 
-      commentAreaContainer.appendChild(addCommentButton); //
-      CommentBoxHelper.container.appendChild(commentAreaContainer);
+      commentAreaContainer.appendChild(addCommentButton);
+      this.container.appendChild(commentAreaContainer);
 
-      CommentBoxHelper.updateMaxlengthLabel();
+      this.updateMaxlengthLabel();
     },
 
+    /**
+     * Add comment to comment-list
+     * @param  {String} comment Comment to be added to comment-list
+     */
     addComment: function(comment) {
       console.log(comment);
-      var container = CommentBoxHelper.get('.comment-display-area .comment-list');
+      var container = this.get('.comment-display-area .comment-list');
       var li = HTMLElementHelper.createElement('LI', {
         'class': 'comment-list-item'
       });
@@ -62,18 +84,21 @@ function CreateCommenBoxHelper(container) {
       container.appendChild(li);
     },
 
+    /**
+     * Update total no. of character typed in comment-writer vs. maxlength (if specified)
+     */
     updateMaxlengthLabel: function() {
-      var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
+      var maxlengthLabel = this.get('.comment-area .comment-maxlength-label');
 
-      if(maxlengthLabel == null) {
+      if (maxlengthLabel == null) {
         return;
       }
 
-      var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+      var commentTextArea = this.get('.comment-area .comment-writer');
       var total = commentTextArea.value.length;
       var text = total;
-      if (CommentBoxHelper.attrs.maxlength != undefined) {
-        var max = parseInt(CommentBoxHelper.attrs.maxlength);
+      if (this.attrs.hasOwnProperty('maxlength')) {
+        var max = parseInt(this.attrs.maxlength);
         var text = total + ' / ' + max;
       }
       if (maxlengthLabel.hasOwnProperty('innerText'))
@@ -82,14 +107,20 @@ function CreateCommenBoxHelper(container) {
         maxlengthLabel.textContent = text;
     },
 
+    /**
+     * Query the container to get specified element
+     * @param  {String} key element key
+     */
     get: function(key) {
-      return CommentBoxHelper.container.querySelector(key);
+      return this.container.querySelector(key);
     },
 
+    /**
+     * Bind add comment button click event
+     */
     bindAddCommentClickEvent: function() {
-      debugger;
-      console.log(this);
-      CommentBoxHelper.get('.comment-area .comment-button').addEventListener('click', function(event) {
+      this.get('.comment-area .comment-button').addEventListener('click', function(event) {
+        debugger;
         var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
         var text = commentTextArea.value;
         if (text == '') {
@@ -98,42 +129,58 @@ function CreateCommenBoxHelper(container) {
         CommentBoxHelper.addComment(text);
         commentTextArea.value = '';
         CommentBoxHelper.updateMaxlengthLabel();
-        CommentBoxHelper.socket.emit('message', {uuid:CommentBoxHelper.attrs.uuid, data:text});
+        CommentBoxHelper.socket.emit('message', {
+          uuid: CommentBoxHelper.attrs.uuid,
+          data: text
+        });
       });
     },
 
+    /**
+     * Bind comment-writer keyup event to update comment-maxlength-label
+     */
     bindCommentTextAreaKeyupEvent: function() {
-      var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+      var commentTextArea = this.get('.comment-area .comment-writer');
       commentTextArea.addEventListener('keyup', function(event) {
         CommentBoxHelper.updateMaxlengthLabel();
       });
     },
 
+    /**
+     * Attribute change event
+     * @param  {String} attr   Attribute name
+     * @param  {String} oldVal Old value of Attribute
+     * @param  {String} newVal New value of Attribute
+     */
     attributeChanged: function(attr, oldVal, newVal) {
       console.log("Attribute changed: attr: %s | old-value: %s | new-value: %s", attr, oldVal, newVal);
-      CommentBoxHelper.attrs[attr] = newVal;
+      this.attrs[attr] = newVal;
       switch (attr) {
         case 'showmaxlenght':
-          CommentBoxHelper.showHideMaxlengthLabel(newVal != null);
+          this.showHideMaxlengthLabel(newVal != null);
           break;
         case 'maxlength':
-          var commentTextArea = CommentBoxHelper.get('.comment-area .comment-writer');
+          var commentTextArea = this.get('.comment-area .comment-writer');
           commentTextArea.setAttribute('maxlength', parseInt(newVal));
-          CommentBoxHelper.updateMaxlengthLabel();
+          this.updateMaxlengthLabel();
           break;
       }
     },
 
+    /**
+     * Show / hide maxlength-label
+     * @param  {Boolean} show true to display maxlength-label, false otherwise.
+     */
     showHideMaxlengthLabel: function(show) {
-      var maxlengthLabel = CommentBoxHelper.get('.comment-area .comment-maxlength-label');
-      if(maxlengthLabel == null) {
+      var maxlengthLabel = this.get('.comment-area .comment-maxlength-label');
+      if (maxlengthLabel == null) {
         var maxlengthLabel = HTMLElementHelper.createElement('LABEL', {
           'class': 'comment-maxlength-label',
         });
-        CommentBoxHelper.get('.comment-area').appendChild(maxlengthLabel);
+        this.get('.comment-area').appendChild(maxlengthLabel);
       }
 
-      if(show === true) {
+      if (show === true) {
         maxlengthLabel.removeAttribute('display');
       } else {
         maxlengthLabel.setAttribute('display', 'none');
@@ -152,7 +199,7 @@ CommentBox.createdCallback = function() {
   var container = HTMLElementHelper.createElement('DIV', {
     'class': 'comment-box'
   });
-  var CommentBoxHelper = CreateCommenBoxHelper(container);
+  var CommentBoxHelper = CreateCommentBoxHelper(container);
   CommentBoxHelper.attrs = HTMLElementHelper.attrToJSON(this);
 
   // create comment display area
@@ -178,14 +225,15 @@ CommentBox.createdCallback = function() {
     button.removeAttribute('disabled');
   });
 
-  CommentBoxHelper.socket.on('subscriptionStatus', function(status){
+  CommentBoxHelper.socket.on('subscriptionStatus', function(status) {
     console.log(status);
   });
 
   CommentBoxHelper.socket.on('message', function(message) {
     console.log(message);
+    debugger;
     // if socket is connected to same server then it share the instance
-    if(message.uuid === CommentBoxHelper.attrs.uuid)
+    if (message.uuid === CommentBoxHelper.attrs.uuid)
       CommentBoxHelper.addComment(message.data);
   });
 
