@@ -1,3 +1,4 @@
+'use strict';
 function CreateCommentBoxHelper(container) {
   var CommentBoxHelper = {
     /**
@@ -214,7 +215,12 @@ CommentBox.createdCallback = function() {
   // keypress event
   CommentBoxHelper.bindCommentTextAreaKeyupEvent();
 
-  var uuid = CommentBoxHelper.attrs.uuid || '';
+  var uuid = null;
+  if(CommentBoxHelper.attrs.hasOwnProperty('uuid')) {
+    uuid = CommentBoxHelper.attrs.uuid;
+  } else {
+    uuid = CommentBoxHelper.attrs.uuid = window.location.href;
+  }
   var server = CommentBoxHelper.attrs.server || 'http://localhost:3000';
 
   CommentBoxHelper.socket = io(server);
@@ -227,11 +233,19 @@ CommentBox.createdCallback = function() {
 
   CommentBoxHelper.socket.on('subscriptionStatus', function(status) {
     console.log(status);
+    if(status.status === 'success') {
+      if(status.data != undefined) {
+        var comments = status.data;
+        comments.forEach(function(comment) {
+          if (comment.uuid === CommentBoxHelper.attrs.uuid)
+            CommentBoxHelper.addComment(comment.data);
+        });
+      }
+    }
   });
 
   CommentBoxHelper.socket.on('message', function(message) {
     console.log(message);
-    debugger;
     // if socket is connected to same server then it share the instance
     if (message.uuid === CommentBoxHelper.attrs.uuid)
       CommentBoxHelper.addComment(message.data);
